@@ -2814,7 +2814,7 @@ def _zlua --env --wrapped [...args: string] {
     if ($args | length) != 0 and $args.0 == "--add" {
         with-env { _ZL_RANDOM: (random int) } { ^$env.ZLUA_LUAEXE $env.ZLUA_SCRIPT --add ...($args | skip 1) }
     } else if ($args | length) != 0 and $args.0 == "--complete" {
-        ^$env.ZLUA_LUAEXE $env.ZLUA_SCRIPT --complete ...($args | skip 1)
+        ^$env.ZLUA_LUAEXE $env.ZLUA_SCRIPT --complete ($args | skip 1 | str join ' ')
     } else {
         mut arg_mode = ''
         mut arg_type = ''
@@ -2869,7 +2869,7 @@ $env.config = ($env.config | update hooks.env_change.PWD ($env.config.hooks.env_
 ]]
 
 local script_complete_nushell = [[
-let zlua_completer = {|spans| $spans | skip 1 | _zlua --complete -m1 ...$in | lines | where {|x| $x != $env.PWD}}
+let zlua_completer = {|spans| _zlua --complete ...$spans | lines | where {|x| $x != $env.PWD}}
 
 $env.config = ($env.config | default {} completions)
 $env.config = ($env.config | update completions ($env.config.completions | default {} external))
